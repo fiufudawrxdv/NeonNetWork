@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NeonMusic</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #222;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #music-player {
+            width: 500px;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        #song-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 20px;
+            padding-left: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #00ff00 #333;
+        }
+
+        #song-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #song-list::-webkit-scrollbar-thumb {
+            background-color: #00ff00;
+            border-radius: 10px;
+        }
+
+        .song {
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 5px;
+            margin-bottom: 10px;
+            background-color: #444;
+            color: #fff;
+            transition: transform 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song:hover {
+            transform: scale(1.01);
+            background-color: #555;
+        }
+
+        #add-buttons {
+            margin-bottom: 30px;
+        }
+
+        #upload-btn {
+    display: inline-flex;
+    padding: 12px 24px; 
+    border: none;
+    border-radius: 5px;
+    background-color: #00ff00;
+    color: #121212;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.4s ease;
+    font-size: 14px; 
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    align-items: center; 
+}
+
+#upload-btn {
+    width: 200px; 
+    height: 40px; 
+    margin-right: 8px;
+}
+
+        #upload-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+
+        #song-info {
+            margin-bottom: 20px;
+        }
+
+        #song-info span {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        button {
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            outline: none;
+            transition: transform 0.2s ease, box-shadow 0.4s ease;
+            background-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0 15px;
+            font-size: 24px;
+            color: #121212;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+
+        #play-pause-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: #121212;
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #444;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        #progress {
+            height: 100%;
+            background-color: #00ff00;
+            border-radius: 4px;
+            width: 0; 
+            transition: width 0.1s linear; 
+        }
+
+        #volume-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #volume-slider {
+            width: 150px;
+            height: 5px;
+            background-color: #444;
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        #volume {
+            height: 100%;
+            background-color: #00ff00;
+            border-radius: 2px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="music-player">
+        <div id="song-list">
+            <!-- songs -->
+            <div class="song" onclick="playSong('idol.mp3', 'Idol - yoasobi')">
+                <p>Idol</p>
+                <p>By yoasobi</p>
+            </div>
+            
+            <div class="song" onclick="playSong('rickroll.mp3', 'Never Gonna Give You Up - Rick Astley')">
+                <p>Never Gonna Give You Up</p>
+                <p>By Rick Astley</p>
+            </div>
+
+            <div class="song" onclick="playSong('KungFuPandaMeme.mp3', 'KungFu Meme')">
+                <p>KungFu Meme </p>
+                <p>By i really dont know🤔</p>
+            </div>
+
+            
+        </div>
+
+        
+
+        
+
+        <input type="file" id="song-file" accept="audio/mp3" style="display: none;">
+
+        <div id="add-buttons">
+            <button id="upload-btn" onclick="openFileInput()">Upload MP3</button>
+        </div>
+        
+        <div id="song-info">
+            <span>Now Playing:</span>
+            <span id="song-name">No song playing</span>
+            <span id="song-duration">0:00</span>
+        </div>
+
+        <!-- controls -->
+        <div id="controls">
+            <button id="play-pause-btn" onclick="togglePlayPause()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- song bar -->
+        <div id="progress-bar" onclick="seek(event)">
+            <div id="progress"></div>
+        </div>
+
+        <!-- volume -->
+        <div id="volume-control">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path d="M12 5v14l11-7z"/>
+            </svg>
+            <div id="volume-slider" onclick="adjustVolume(event)">
+                <div id="volume"></div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path d="M13.9 8.6l2.5-2.5C17.8 6.1 18 5.5 18 5c0-0.6-0.2-1.2-0.6-1.7c-0.9-0.9-2.4-0.9-3.3 0l-2.5 2.5l-2.5-2.5c-0.9-0.9-2.4-0.9-3.3 0C5.2 3.8 5 4.4 5 5c0 0.5 0.2 1.1 0.6 1.6l2.5 2.5l-2.5 2.5C3.2 12.2 3 12.8 3 13.3c0 0.6 0.2 1.2 0.6 1.7c0.9 0.9 2.4 0.9 3.3 0l2.5-2.5l2.5 2.5c0.9 0.9 2.4 0.9 3.3 0c0.4-0.4 0.6-1 0.6-1.6c0-0.5-0.2-1.1-0.6-1.6l-2.5-2.5z"/>
+            </svg>
+        </div>
+
+        <audio id="audio" onended="playNextSong()" ontimeupdate="updateProgress()"></audio>
+
+        <script>
+            let isPlaying = false;
+            let audio = document.getElementById('audio');
+            let songNameDisplay = document.getElementById('song-name');
+            let songDurationDisplay = document.getElementById('song-duration');
+            let playPauseBtn = document.getElementById('play-pause-btn');
+            let progress = document.getElementById('progress');
+            let volume = document.getElementById('volume');
+
+            function playSong(songSrc, songTitle) {
+                songNameDisplay.innerText = songTitle;
+                audio.src = songSrc;
+                audio.load();
+                audio.play();
+                playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                isPlaying = true;
+            }
+
+            function togglePlayPause() {
+                if (isPlaying) {
+                    audio.pause();
+                    playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                    isPlaying = false;
+                } else {
+                    if (audio.src !== '') {
+                        audio.play();
+                        playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                        isPlaying = true;
+                    }
+                }
+            }
+
+            function seek(event) {
+                const progressBar = document.getElementById('progress-bar');
+                const rect = progressBar.getBoundingClientRect();
+                const totalWidth = rect.width;
+                const clickX = event.clientX - rect.left;
+                const seekTime = (clickX / totalWidth) * audio.duration;
+                audio.currentTime = seekTime;
+            }
+
+            function updateProgress() {
+                const currentProgress = (audio.currentTime / audio.duration) * 100;
+                progress.style.width = `${currentProgress}%`;
+                const formattedTime = formatTime(audio.currentTime);
+                songDurationDisplay.textContent = formattedTime;
+            }
+
+            function formatTime(time) {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60);
+                const formattedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+                return `${minutes}:${formattedSeconds}`;
+            }
+
+            function adjustVolume(event) {
+                const volumeSlider = document.getElementById('volume-slider');
+                const rect = volumeSlider.getBoundingClientRect();
+                const totalWidth = rect.width;
+                const clickX = event.clientX - rect.left;
+                const newVolume = clickX / totalWidth;
+                audio.volume = newVolume;
+                volume.style.width = `${newVolume * 100}%`;
+            }
+
+            function openFileInput() {
+                const fileInput = document.getElementById('song-file');
+                fileInput.click(); // Open file dialog
+            }
+
+            // Handle file input change
+            document.getElementById('song-file').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (file.type.startsWith('audio/')) {
+                    const songTitle = file.name.replace(/\.[^/.]+$/, ''); // Extract title from filename
+                    const songUrl = URL.createObjectURL(file);
+                    addSong(songUrl, songTitle);
+                } else {
+                    alert('Invalid file type. Please select an MP3 file.');
+                }
+
+               
+                event.target.value = '';
+            });
+
+            function addSong(songSrc, songTitle) {
+                const newSong = document.createElement('div');
+                newSong.className = 'song';
+                newSong.onclick = () => playSong(songSrc, songTitle);
+
+                const titleParagraph = document.createElement('p');
+                titleParagraph.textContent = songTitle;
+
+                const artistParagraph = document.createElement('p');
+                artistParagraph.textContent = 'By Unknown Artist';
+
+                newSong.appendChild(titleParagraph);
+                newSong.appendChild(artistParagraph);
+
+                document.getElementById('song-list').appendChild(newSong);
+            }
+
+            function resetPlayer() {
+                audio.pause();
+                audio.currentTime = 0;
+                progress.style.width = '0%';
+                songNameDisplay.textContent = 'No song playing';
+                isPlaying = false;
+            }
+        </script>
+    </div>
+</body>
+</html>
